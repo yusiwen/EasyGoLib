@@ -33,7 +33,7 @@ const (
 type DBConfig struct {
 	Type     DBType
 	URI      string
-	LogLevel logger.LogLevel
+	LogLevel string
 }
 
 var SQL *gorm.DB
@@ -56,6 +56,20 @@ func Init(config *DBConfig) (err error) {
 	return nil
 }
 
+func getLogLevel(level string) logger.LogLevel {
+	l := strings.ToLower(level)
+	switch l {
+	case "info":
+		return logger.Info
+	case "warn":
+		return logger.Warn
+	case "error":
+		return logger.Error
+	default:
+		return logger.Silent
+	}
+}
+
 func createSQLite(config *DBConfig) (*gorm.DB, error) {
 	f := config.URI
 	if strings.TrimSpace(f) == "" {
@@ -72,10 +86,10 @@ func createSQLite(config *DBConfig) (*gorm.DB, error) {
 		Logger: logger.New(
 			log.New(os.Stdout, "[GORM] ", log.LstdFlags), // io writer
 			logger.Config{
-				SlowThreshold:             time.Second,     // Slow SQL threshold
-				LogLevel:                  config.LogLevel, // Log level
-				IgnoreRecordNotFoundError: true,            // Ignore ErrRecordNotFound error for logger
-				Colorful:                  false,           // Disable color
+				SlowThreshold:             time.Second,                  // Slow SQL threshold
+				LogLevel:                  getLogLevel(config.LogLevel), // Log level
+				IgnoreRecordNotFoundError: true,                         // Ignore ErrRecordNotFound error for logger
+				Colorful:                  false,                        // Disable color
 			}),
 	})
 	if err != nil {
@@ -94,10 +108,10 @@ func createMySQL(config *DBConfig) (*gorm.DB, error) {
 		Logger: logger.New(
 			log.New(os.Stdout, "[GORM] ", log.LstdFlags), // io writer
 			logger.Config{
-				SlowThreshold:             time.Second,     // Slow SQL threshold
-				LogLevel:                  config.LogLevel, // Log level
-				IgnoreRecordNotFoundError: true,            // Ignore ErrRecordNotFound error for logger
-				Colorful:                  false,           // Disable color
+				SlowThreshold:             time.Second,                  // Slow SQL threshold
+				LogLevel:                  getLogLevel(config.LogLevel), // Log level
+				IgnoreRecordNotFoundError: true,                         // Ignore ErrRecordNotFound error for logger
+				Colorful:                  false,                        // Disable color
 			}),
 	})
 	if err != nil {

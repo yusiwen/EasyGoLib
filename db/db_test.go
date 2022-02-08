@@ -2,7 +2,6 @@ package db
 
 import (
 	"github.com/stretchr/testify/assert"
-	"gorm.io/gorm/logger"
 	"testing"
 )
 
@@ -17,7 +16,7 @@ func TestSQLite(t *testing.T) {
 	err := Init(&DBConfig{
 		Type:     SQLite,
 		URI:      "",
-		LogLevel: logger.Info,
+		LogLevel: "Info",
 	})
 	if err != nil {
 		t.Error(err)
@@ -45,7 +44,7 @@ func TestMySQL(t *testing.T) {
 	err := Init(&DBConfig{
 		Type:     MySQL,
 		URI:      "db_test_user:db_test_user_password@tcp(lattepanda:3306)/db_test?charset=utf8mb4&parseTime=True&loc=Local",
-		LogLevel: logger.Info,
+		LogLevel: "Info",
 	})
 	if err != nil {
 		t.Error(err)
