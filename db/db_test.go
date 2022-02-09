@@ -21,22 +21,10 @@ func TestSQLite(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	err = SQL.AutoMigrate(TestModel{})
+	count, err := doTest()
 	if err != nil {
 		t.Error(err)
 	}
-	SQL.Where("1=1").Delete(&TestModel{})
-	result := SQL.Create(&TestModel{
-		Id:      "1",
-		Name:    "Test_User",
-		Address: "Test Address 1#",
-		Email:   "test@email.com",
-	})
-	if result.Error != nil {
-		t.Error(result.Error)
-	}
-	count := int64(-1)
-	SQL.Model(TestModel{}).Where("name = ?", "Test_User").Count(&count)
 	assert.Equal(t, int64(1), count, "count should be 1")
 }
 
@@ -49,9 +37,33 @@ func TestMySQL(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	err = SQL.AutoMigrate(TestModel{})
+	count, err := doTest()
 	if err != nil {
 		t.Error(err)
+	}
+	assert.Equal(t, int64(1), count, "count should be 1")
+}
+
+func TestPostgres(t *testing.T) {
+	err := Init(&DBConfig{
+		Type:     Postgres,
+		URI:      "host=lattepanda user=db_test_user password=db_test_user_password dbname=db_test port=5432 sslmode=disable TimeZone=Asia/Shanghai",
+		LogLevel: "Info",
+	})
+	if err != nil {
+		t.Error(err)
+	}
+	count, err := doTest()
+	if err != nil {
+		t.Error(err)
+	}
+	assert.Equal(t, int64(1), count, "count should be 1")
+}
+
+func doTest() (int64, error) {
+	err := SQL.AutoMigrate(TestModel{})
+	if err != nil {
+		return 0, err
 	}
 	SQL.Where("1=1").Delete(&TestModel{})
 	SQL.Create(&TestModel{
@@ -62,5 +74,5 @@ func TestMySQL(t *testing.T) {
 	})
 	count := int64(-1)
 	SQL.Model(TestModel{}).Where("name = ?", "Test_User").Count(&count)
-	assert.Equal(t, int64(1), count, "count should be 1")
+	return count, nil
 }
